@@ -191,12 +191,10 @@
                   "type": "object",
                   "properties": {
                     "errors": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Internal Server Error"
                     }
                   }
-                },
-                "example": {
-                  "errors": "Internal Server Error"
                 }
               }
             }
@@ -1113,7 +1111,7 @@
                           },
                           "message": {
                             "type": "string",
-                            "example": "Name cannot contain number"
+                            "example": "Name must be at least 1 character and cannot exceed 30 characters"
                           }
                         }
                       }
@@ -1370,7 +1368,7 @@
                           },
                           "message": {
                             "type": "string",
-                            "example": "Name cannot contain number"
+                            "example": "Name must be at least 1 character and cannot exceed 30 characters"
                           }
                         }
                       }
@@ -1523,19 +1521,22 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "type",
+                  "user_id",
+                  "category_id"
+                ],
                 "properties": {
                   "type": {
                     "type": "string",
                     "enum": [
                       "Income",
                       "Expense"
-                    ],
-                    "example": "Income"
+                    ]
                   },
                   "user_id": {
                     "type": "string",
-                    "format": "uuid",
-                    "example": "e204b50a-9d09-44ac-b743-3a01c96b5c80"
+                    "format": "uuid"
                   },
                   "category_id": {
                     "type": "string",
@@ -1543,21 +1544,54 @@
                   }
                 }
               },
-              "example": {}
+              "example": {
+                "type": "Income",
+                "user_id": "e204b50a-9d09-44ac-b743-3a01c96b5c80",
+                "category_id": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+              }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "",
+            "description": "Success Create Mutation Ledger",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": ["Income", "Expense"],
+                          "example": "Income"
+                        },
+                        "user_id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "e204b50a-9d09-44ac-b743-3a01c96b5c80"
+                        },
+                        "category_id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }
           },
           "400": {
-            "description": "",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -1581,14 +1615,25 @@
                 },
                 "example": {
                   "errors": [
-                    {}
+                    {
+                      "path": "type",
+                      "message": "Type must be 'Income' or 'Expense'"
+                    },
+                    { 
+                    "path": "category_id",
+                    "message": "Category id not found in database"
+                    },
+                    {
+                    "path": "user_id",
+                    "message": "User id not found in database"
+                    }
                   ]
                 }
               }
             }
           },
           "401": {
-            "description": "",
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
