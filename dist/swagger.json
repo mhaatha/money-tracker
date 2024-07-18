@@ -1,0 +1,2207 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Money Tracker RESTful API",
+    "version": "1.0.0",
+    "description": "OpenAPI for my simple Money Tracker REST API",
+    "termsOfService": "https://github.com/mhaatha",
+    "contact": {
+      "name": "Hafidz Athaya",
+      "email": "mhafidza528@gmail.com",
+      "url": "https://github.com/mhaatha"
+    },
+    "license": {
+      "name": "APACHE 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api/v1",
+      "description": "Development"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "REGISTER"
+        ],
+        "summary": "Register an user",
+        "description": "Create an user and save it to database",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 20
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Password must be at least 8 characters and must contain 1 letter and 1 number",
+                    "minLength": 8
+                  },
+                  "first_name": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 50,
+                    "nullable": true
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 50,
+                    "nullable": true
+                  }
+                }
+              },
+              "example": {
+                "username": "johndoe",
+                "email": "johndoe@example.com",
+                "password": "johndoe123",
+                "first_name": "John",
+                "last_name": "Doe"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Register Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string",
+                          "format": "email"
+                        },
+                        "first_name": {
+                          "type": "string"
+                        },
+                        "last_name": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "id": "e204b50a-9d09-44ac-b743-3a01c96b5c80",
+                    "username": "johndoe",
+                    "email": "johndoe@example.com",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "createdAt": "2024-07-18",
+                    "updatedAt": "2024-07-18"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "errors": [
+                    {
+                      "path": "username",
+                      "message": "Required"
+                    },
+                    {
+                      "path": "email",
+                      "message": "Required"
+                    },
+                    {
+                      "path": "password",
+                      "message": "Required"
+                    },
+                    {
+                      "path": "first_name",
+                      "message": "First_name must be at least 3 characters and cannot exceed 50 characters"
+                    },
+                    {
+                      "path": "last_name",
+                      "message": "Last_name cannot contain number"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Sever Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "LOGIN"
+        ],
+        "summary": "Login with an existing user",
+        "description": "Will return access and refresh JWT if login credentials is valid",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "password"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 20
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Password must be at least 8 characters and must contain 1 letter and 1 number",
+                    "minLength": 8
+                  }
+                }
+              },
+              "example": {
+                "username": "johndoe",
+                "password": "johndoe123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "username": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "tokens": {
+                      "type": "object",
+                      "properties": {
+                        "access": {
+                          "type": "object",
+                          "properties": {
+                            "token": {
+                              "type": "string",
+                              "format": "JWT"
+                            },
+                            "expired": {
+                              "type": "string",
+                              "format": "date"
+                            }
+                          }
+                        },
+                        "refresh": {
+                          "type": "object",
+                          "properties": {
+                            "token": {
+                              "type": "string",
+                              "format": "JWT"
+                            },
+                            "expired": {
+                              "type": "string",
+                              "format": "date"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "id": "e204b50a-9d09-44ac-b743-3a01c96b5c80",
+                    "username": "johndoe"
+                  },
+                  "tokens": {
+                    "access": {
+                      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlMjA0YjUwYS05ZDA5LTQ0YWMtYjc0My0zYTAxYzk2YjVjODAiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MTYyMzkwMjQsInR5cGUiOiJhY2Nlc3MifQ.fVZi4QdkXu6dEz_v-KX91m_0Ne95ThfmTNL3bk0BqLk",
+                      "expired": "2024-07-18T05:06:09.004Z"
+                    },
+                    "refresh": {
+                      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlMjA0YjUwYS05ZDA5LTQ0YWMtYjc0My0zYTAxYzk2YjVjODAiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MTYyMzkwMjQsInR5cGUiOiJyZWZyZXNoIn0.6rFJlFnBpSr80J3VVkoao34wW0yfkCinoAwCJR5CkKk",
+                      "expired": "2024-08-17T04:36:09.011Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "errors": [
+                    {
+                      "path": "username",
+                      "message": "Username must be at least 6 characters"
+                    },
+                    {
+                      "path": "password",
+                      "message": "Required"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Username or password is incorrect"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "LOGOUT"
+        ],
+        "summary": "Logout an user",
+        "description": "JWT refresh will be deleted from database",
+        "responses": {
+          "200": {
+            "description": "Logout Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "string",
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Refresh token is not found in database"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh-token": {
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "REFRESH TOKEN"
+        ],
+        "summary": "Refresh JWT",
+        "description": "If refresh JWT is not expired yet, this endpoint will generate new access and refresh JWT",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refreshToken": {
+                    "type": "string",
+                    "format": "JWT",
+                    "example": "yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlMjA0YjUwYS05ZDA5LTQ0YWMtYjc0My0zYTAxYzk2YjVjODAiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MTYyMzkwMjQsInR5cGUiOiJyZWZyZXNoIn0.6rFJlFnBpSr80J3VVkoao34wW0yfkCinoAwCJR5CkKk"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Refresh Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access": {
+                          "type": "object",
+                          "properties": {
+                            "token": {
+                              "type": "string",
+                              "format": "JWT"
+                            },
+                            "expired": {
+                              "type": "string",
+                              "format": "date"
+                            }
+                          }
+                        },
+                        "refresh": {
+                          "type": "object",
+                          "properties": {
+                            "token": {
+                              "type": "string",
+                              "format": "JWT"
+                            },
+                            "expired": {
+                              "type": "string",
+                              "format": "date"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "access": {
+                      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlMjA0YjUwYS05ZDA5LTQ0YWMtYjc0My0zYTAxYzk2YjVjODAiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMzAsInR5cGUiOiJhY2Nlc3MifQ.QoUMgsFKOKABVXmEhijrf5cLxhL1YIjQqQXsnUwLE8U",
+                      "expired": "2024-07-18T010:06:09.004Z"
+                    },
+                    "refresh": {
+                      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlMjA0YjUwYS05ZDA5LTQ0YWMtYjc0My0zYTAxYzk2YjVjODAiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMzAsInR5cGUiOiJhY2Nlc3MifQ.QoUMgsFKOKABVXmEhijrf5cLxhL1YIjQqQXsnUwLE8U",
+                      "expired": "2024-08-18T10:06:09.004Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": {
+                            "type": "string",
+                            "example": "refreshToken"
+                          },
+                          "message": {
+                            "type": "string",
+                            "example": "Invalid JWT Token"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/current-user": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "USER"
+        ],
+        "summary": "Get current user",
+        "description": "Get current user from database",
+        "responses": {
+          "200": {
+            "description": "Success Get Current User",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "e204b50a-9d09-44ac-b743-3a01c96b5c80"
+                        },
+                        "username": {
+                          "type": "string",
+                          "example": "johndoe"
+                        },
+                        "email": {
+                          "type": "string",
+                          "format": "email",
+                          "example": "johndoe@example.com"
+                        },
+                        "first_name": {
+                          "type": "string",
+                          "example": "John"
+                        },
+                        "last_name": {
+                          "type": "string",
+                          "example": "Doe"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "USER"
+        ],
+        "summary": "Update current user",
+        "description": "Update current user in database",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "You can change some of the properties below",
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 20,
+                    "nullable": true,
+                    "example": "janedoe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "nullable": true,
+                    "example": "janedoe@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Password must be at least 8 characters and must contain 1 letter and 1 number",
+                    "minLength": 8,
+                    "nullable": true,
+                    "example": "janedoe123"
+                  },
+                  "first_name": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 50,
+                    "nullable": true,
+                    "example": "Jane"
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 50,
+                    "nullable": true,
+                    "example": "Doe"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Update Current User",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "username": {
+                          "type": "string",
+                          "example": "janedoe"
+                        },
+                        "email": {
+                          "type": "string",
+                          "format": "email",
+                          "example": "janedoe@gmail.com"
+                        },
+                        "password": {
+                          "type": "string",
+                          "example": "janedoe123"
+                        },
+                        "first_name": {
+                          "type": "string",
+                          "example": "Jane"
+                        },
+                        "last_name": {
+                          "type": "string",
+                          "example": "Doe"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "errors": [
+                    {
+                      "path": "username",
+                      "message": "Username must be at least 6 characters and cannot exceed 20"
+                    },
+                    {
+                      "path": "email",
+                      "message": "Invalid email"
+                    },
+                    {
+                      "path": "password",
+                      "message": "Password must be at least 8 characters and must contain 1 letter and 1 number"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "USER"
+        ],
+        "summary": "Delete current user",
+        "description": "Delete current user in database",
+        "responses": {
+          "200": {
+            "description": "Success Delete Current User",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "string",
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "User not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/current-user/balance": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "USER"
+        ],
+        "summary": "Get total balance",
+        "description": "Get current user's total balance",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "total_balance": {
+                          "description": "Total balance in Indonesian Rupiah",
+                          "type": "number",
+                          "example": 50000
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories": {
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "CATEGORY"
+        ],
+        "summary": "Create new category",
+        "description": "Create new category and it cannot duplicate",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 30,
+                    "example": "Food and Drink"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "Food and Drink"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": {
+                            "type": "string",
+                            "example": "name"
+                          },
+                          "message": {
+                            "type": "string",
+                            "example": "Name must be at least 1 character and cannot exceed 30 characters"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "CATEGORY"
+        ],
+        "summary": "Get categories",
+        "description": "Get categories created by current user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": false,
+            "description": "Optional parameter",
+            "schema": {
+              "type": "string",
+              "example": "Food and Drink"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                              },
+                              "name": {
+                                "type": "string",
+                                "example": "Food and Drink"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "format": "uuid",
+                              "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                            },
+                            "name": {
+                              "type": "string",
+                              "example": "Food and Drink"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Category not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories/{categoryId}": {
+      "put": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "CATEGORY"
+        ],
+        "summary": "Update category",
+        "description": "Update category by categoryId",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 30,
+                    "example": "Updated Category"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Update Category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "Updated Category"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": {
+                            "type": "string",
+                            "example": "name"
+                          },
+                          "message": {
+                            "type": "string",
+                            "example": "Name must be at least 1 character and cannot exceed 30 characters"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "CATEGORY"
+        ],
+        "summary": "Delete category",
+        "description": "Delete category by categoryId",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "categoryId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success Delete Category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "string",
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Category id not found in database"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mutations": {
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "MUTATION"
+        ],
+        "summary": "Create new mutation ledger",
+        "description": "Mutation ledger's type can be income or expense",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "user_id",
+                  "category_id",
+                  "amount"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "Income",
+                      "Expense"
+                    ]
+                  },
+                  "user_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "category_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "amount": {
+                    "type": "number"
+                  }
+                }
+              },
+              "example": {
+                "type": "Income",
+                "user_id": "e204b50a-9d09-44ac-b743-3a01c96b5c80",
+                "category_id": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c",
+                "amount": 50000
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success Create Mutation Ledger",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "Income",
+                            "Expense"
+                          ],
+                          "example": "Income"
+                        },
+                        "user_id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "e204b50a-9d09-44ac-b743-3a01c96b5c80"
+                        },
+                        "category_id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "example": 50000
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "errors": [
+                    {
+                      "path": "type",
+                      "message": "Type must be 'Income' or 'Expense'"
+                    },
+                    {
+                      "path": "category_id",
+                      "message": "Category id not found in database"
+                    },
+                    {
+                      "path": "user_id",
+                      "message": "User id not found in database"
+                    },
+                    {
+                      "path": "amount",
+                      "message": "Amount must be greater than 0"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mutations/current-user": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "MUTATION"
+        ],
+        "summary": "Get mutations by current user",
+        "description": "Get mutations by current user from database",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "description": "Optional parameter",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Income",
+                "Expense"
+              ],
+              "example": "Income"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "description": "Optional parameter",
+            "schema": {
+              "type": "string",
+              "example": "Food and Drink"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "description": "Success get all mutations",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "Income",
+                                  "Expense"
+                                ],
+                                "example": "Income"
+                              },
+                              "user_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "e204b50a-9d09-44ac-b743-3a01c96b5c80"
+                              },
+                              "category_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "description": "Success get all mutations by type",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "Income",
+                                  "Expense"
+                                ],
+                                "example": "Income"
+                              },
+                              "user_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "e204b50a-9d09-44ac-b743-3a01c96b5c80"
+                              },
+                              "category_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "description": "Success get all mutations by category name",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "Income",
+                                  "Expense"
+                                ],
+                                "example": "Income"
+                              },
+                              "user_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "e204b50a-9d09-44ac-b743-3a01c96b5c80"
+                              },
+                              "category_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Mutation not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mutations/{mutationId}": {
+      "patch": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "MUTATION"
+        ],
+        "summary": "Update mutation",
+        "description": "Update mutation by mutationId",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "mutationId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "user_id",
+                  "category_id",
+                  "amount"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "Income",
+                      "Expense"
+                    ]
+                  },
+                  "user_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "category_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "amount": {
+                    "type": "number"
+                  }
+                }
+              },
+              "example": {
+                "type": "Expense",
+                "user_id": "e204b50a-9d09-44ac-b743-3a01c96b5c80",
+                "category_id": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c",
+                "amount": 10000
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Update Mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "Income",
+                            "Expense"
+                          ],
+                          "example": "Expense"
+                        },
+                        "user_id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "e204b50a-9d09-44ac-b743-3a01c96b5c80"
+                        },
+                        "category_id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "example": 10000
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "errors": [
+                    {
+                      "path": "type",
+                      "message": "Type must be 'Income' or 'Expense'"
+                    },
+                    {
+                      "path": "category_id",
+                      "message": "Category id not found in database"
+                    },
+                    {
+                      "path": "user_id",
+                      "message": "User id not found in database"
+                    },
+                    {
+                      "path": "amount",
+                      "message": "Amount must be greater than 0"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Mutation not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "MUTATION"
+        ],
+        "summary": "Delete mutation",
+        "description": "Delete mutation by mutationId",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "mutationId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success Delete Mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "string",
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Mutation not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "description": "JWT Access Token",
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
