@@ -1173,6 +1173,7 @@
             "in": "query",
             "name": "name",
             "required": false,
+            "description": "Optional parameter",
             "schema": {
               "type": "string",
               "example": "Food and Drink"
@@ -1181,40 +1182,59 @@
         ],
         "responses": {
           "200": {
-            "description": "Success Get Category",
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "data": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
                             "type": "object",
                             "properties": {
                               "id": {
                                 "type": "string",
+                                "format": "uuid",
                                 "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
                               },
                               "name": {
                                 "type": "string",
-                                "example": "Updated Category"
+                                "example": "Food and Drink"
                               }
                             }
                           }
                         }
                       }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "format": "uuid",
+                              "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                            },
+                            "name": {
+                              "type": "string",
+                              "example": "Food and Drink"
+                            }
+                          }
+                        }
+                      }
                     }
-                  }
+                  ]
                 }
               }
             }
           },
           "401": {
-            "description": "",
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
