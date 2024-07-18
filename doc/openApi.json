@@ -1524,7 +1524,8 @@
                 "required": [
                   "type",
                   "user_id",
-                  "category_id"
+                  "category_id",
+                  "amount"
                 ],
                 "properties": {
                   "type": {
@@ -1541,13 +1542,17 @@
                   "category_id": {
                     "type": "string",
                     "format": "uuid"
+                  },
+                  "amount": {
+                    "type": "number"
                   }
                 }
               },
               "example": {
                 "type": "Income",
                 "user_id": "e204b50a-9d09-44ac-b743-3a01c96b5c80",
-                "category_id": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                "category_id": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c",
+                "amount": 50000
               }
             }
           }
@@ -1570,7 +1575,10 @@
                         },
                         "type": {
                           "type": "string",
-                          "enum": ["Income", "Expense"],
+                          "enum": [
+                            "Income",
+                            "Expense"
+                          ],
                           "example": "Income"
                         },
                         "user_id": {
@@ -1582,6 +1590,10 @@
                           "type": "string",
                           "format": "uuid",
                           "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "example": 50000
                         }
                       }
                     }
@@ -1619,13 +1631,17 @@
                       "path": "type",
                       "message": "Type must be 'Income' or 'Expense'"
                     },
-                    { 
-                    "path": "category_id",
-                    "message": "Category id not found in database"
+                    {
+                      "path": "category_id",
+                      "message": "Category id not found in database"
                     },
                     {
-                    "path": "user_id",
-                    "message": "User id not found in database"
+                      "path": "user_id",
+                      "message": "User id not found in database"
+                    },
+                    {
+                      "path": "amount",
+                      "message": "Amount must be greater than 0"
                     }
                   ]
                 }
@@ -1678,11 +1694,209 @@
           "MUTATION"
         ],
         "summary": "Get mutations by current user",
-        "description": "Get mutations by current user from database"
+        "description": "Get mutations by current user from database",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "description": "Optional parameter",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Income",
+                "Expense"
+              ],
+              "example": "Income"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "description": "Optional parameter",
+            "schema": {
+              "type": "string",
+              "example": "Food and Drink"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "description": "Success get all mutations",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "Income",
+                                  "Expense"
+                                ],
+                                "example": "Income"
+                              },
+                              "user_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "e204b50a-9d09-44ac-b743-3a01c96b5c80"
+                              },
+                              "category_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "description": "Success get all mutations by type",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "Income",
+                                  "Expense"
+                                ],
+                                "example": "Income"
+                              },
+                              "user_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "e204b50a-9d09-44ac-b743-3a01c96b5c80"
+                              },
+                              "category_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "description": "Success get all mutations by category name",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "Income",
+                                  "Expense"
+                                ],
+                                "example": "Income"
+                              },
+                              "user_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "e204b50a-9d09-44ac-b743-3a01c96b5c80"
+                              },
+                              "category_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Mutation not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/mutations/{mutationId}": {
-      "put": {
+      "patch": {
         "security": [
           {
             "bearerAuth": []
@@ -1692,7 +1906,201 @@
           "MUTATION"
         ],
         "summary": "Update mutation",
-        "description": "Update mutation by mutationId"
+        "description": "Update mutation by mutationId",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "mutationId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "user_id",
+                  "category_id",
+                  "amount"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "Income",
+                      "Expense"
+                    ]
+                  },
+                  "user_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "category_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "amount": {
+                    "type": "number"
+                  }
+                }
+              },
+              "example": {
+                "type": "Expense",
+                "user_id": "e204b50a-9d09-44ac-b743-3a01c96b5c80",
+                "category_id": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c",
+                "amount": 10000
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Update Mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "Income",
+                            "Expense"
+                          ],
+                          "example": "Expense"
+                        },
+                        "user_id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "e204b50a-9d09-44ac-b743-3a01c96b5c80"
+                        },
+                        "category_id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "bb24af6c-19a1-4b4b-b71d-2fd22d0e4d0c"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "example": 10000
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "errors": [
+                    {
+                      "path": "type",
+                      "message": "Type must be 'Income' or 'Expense'"
+                    },
+                    {
+                      "path": "category_id",
+                      "message": "Category id not found in database"
+                    },
+                    {
+                      "path": "user_id",
+                      "message": "User id not found in database"
+                    },
+                    {
+                      "path": "amount",
+                      "message": "Amount must be greater than 0"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Mutation not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       },
       "delete": {
         "security": [
@@ -1704,35 +2112,85 @@
           "MUTATION"
         ],
         "summary": "Delete mutation",
-        "description": "Delete mutation by mutationId"
-      }
-    },
-    "/mutations/type": {
-      "get": {
-        "security": [
+        "description": "Delete mutation by mutationId",
+        "parameters": [
           {
-            "bearerAuth": []
+            "in": "path",
+            "name": "mutationId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "7a0e29cf-f74c-4687-9455-9bba4b8f4861"
+            }
           }
         ],
-        "tags": [
-          "MUTATION"
-        ],
-        "summary": "Get mutations",
-        "description": "Get mutations by type"
-      }
-    },
-    "/mutations/category": {
-      "get": {
-        "security": [
-          {
-            "bearerAuth": []
+        "responses": {
+          "200": {
+            "description": "Success Delete Mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "string",
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "JWT Access Token is invalid or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Mutation not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
           }
-        ],
-        "tags": [
-          "MUTATION"
-        ],
-        "summary": "Get mutations",
-        "description": "Get mutations by category"
+        }
       }
     }
   },
