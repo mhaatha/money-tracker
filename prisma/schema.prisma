@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String   @id @default(uuid())
+  username         String
+  email            String
+  password         String
+  first_name       String?
+  last_name        String?
+  total_balance    Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  tokens           Token[]
+  mutationLedgers  Mutation_Ledger[]
+}
+
+model Token {
+  id             String  @id @default(uuid())
+  user           User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id        String
+  refresh_token  String
+}
+
+model Category {
+  id    String     @id @default(uuid())
+  name  String
+  mutationLedgers  Mutation_Ledger[]
+}
+
+model Mutation_Ledger {
+  id           String     @id @default(uuid())
+  type         Type   
+  user         User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id      String
+  category     Category?  @relation(fields: [category_id], references: [id], onDelete: SetNull) 
+  category_id  String?
+  amount       Int
+}
+
+enum Type {
+  Income
+  Expense
+}
