@@ -4,7 +4,10 @@
   "description": "RESTful API for tracking money, where it goes and what you spend the money for.",
   "main": "index.js",
   "scripts": {
-    "start:dev": "npx nodemon dist/index.js"
+    "start:dev": "nodemon dist/index.js",
+    "lint": "eslint . --ext .ts",
+    "tsc": "tsc --watch",
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
   },
   "repository": {
     "type": "git",
@@ -21,7 +24,11 @@
   },
   "devDependencies": {
     "@types/node": "^20.14.11",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
+    "eslint": "^8.57.0",
     "nodemon": "^3.1.4",
+    "prettier": "^3.3.3",
     "typescript": "^5.5.3"
   }
 }
