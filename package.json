@@ -4,7 +4,7 @@
   "description": "RESTful API for tracking money, where it goes and what you spend the money for.",
   "main": "index.js",
   "scripts": {
-    "start:dev": "cross-env NODE_ENV=development nodemon dist/index.js",
+    "start:dev": "cross-env LOG_LEVEL=debug NODE_ENV=development nodemon dist/src/index.js",
     "lint": "eslint . --ext .ts",
     "tsc": "tsc --watch",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
@@ -23,7 +23,8 @@
     "@prisma/client": "^5.17.0",
     "@types/express": "^4.17.21",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "winston": "^3.13.1"
   },
   "devDependencies": {
     "@types/node": "^20.14.11",
