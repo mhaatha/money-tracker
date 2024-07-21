@@ -31,5 +31,3 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
     next(error);
   }
 };
-
-console.log("adsad")

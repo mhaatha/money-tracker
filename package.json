@@ -7,7 +7,8 @@
     "start:dev": "cross-env LOG_LEVEL=debug NODE_ENV=development nodemon dist/src/index.js",
     "lint": "eslint . --ext .ts",
     "tsc": "tsc --watch",
-    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "prepare": "husky"
   },
   "husky": {
     "hooks": {
