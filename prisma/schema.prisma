@@ -9,8 +9,8 @@ datasource db {
 
 model User {
   id               String   @id @default(uuid())
-  username         String
-  email            String
+  username         String   @unique
+  email            String   @unique
   password         String
   first_name       String?
   last_name        String?
@@ -24,7 +24,7 @@ model User {
 model Token {
   id             String  @id @default(uuid())
   user           User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id        String
+  user_id        String  @unique
   refresh_token  String
 }
 
