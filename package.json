@@ -9,6 +9,11 @@
     "tsc": "tsc --watch",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run prettier-format && npm run lint"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mhaatha/money-tracker.git"
@@ -32,6 +37,7 @@
     "@typescript-eslint/parser": "^7.16.1",
     "cross-env": "^7.0.3",
     "eslint": "^8.57.0",
+    "husky": "^9.1.1",
     "nodemon": "^3.1.4",
     "prettier": "^3.3.3",
     "prisma": "^5.17.0",
