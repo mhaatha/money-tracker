@@ -1,8 +1,16 @@
+import * as service from '../services/auth.service';
+import { RequestBody, ResponseData } from '../models/auth.model';
+import { StatusCodes } from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.send('Register');
+    const data: RequestBody = req.body;
+    const response: ResponseData = await service.create(data);
+
+    res.status(StatusCodes.CREATED).json({
+      data: response
+    });
   } catch (error) {
     next(error);
   }
