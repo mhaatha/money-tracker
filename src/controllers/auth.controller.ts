@@ -1,12 +1,19 @@
 import * as service from '../services/auth.service';
-import { RequestBody, ResponseData } from '../models/auth.model';
+import {
+  RequestLogin,
+  RequestRegister,
+  ResponseLogin,
+  ResponseRegister
+} from '../models/auth.model';
 import { StatusCodes } from 'http-status-codes';
+import { generateAuthToken } from '../services/token.service';
 import { Request, Response, NextFunction } from 'express';
+import { TokenResponse } from '../models/token.model';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const data: RequestBody = req.body;
-    const response: ResponseData = await service.create(data);
+    const data: RequestRegister = req.body;
+    const response: ResponseRegister = await service.create(data);
 
     res.status(StatusCodes.CREATED).json({
       data: response
@@ -18,7 +25,14 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.send('Login');
+    const data: RequestLogin = req.body;
+    const response: ResponseLogin = await service.login(data);
+    const tokens: TokenResponse = await generateAuthToken(response.id);
+
+    res.status(StatusCodes.OK).json({
+      data: response,
+      tokens
+    });
   } catch (error) {
     next(error);
   }
