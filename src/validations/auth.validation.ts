@@ -6,7 +6,10 @@ export const requestBody: ZodType = z
       .string()
       .min(6)
       .max(20)
-      .regex(/^[a-z]*$/, { message: 'Username must be lowercase' }),
+      .regex(/^[a-z]*$/, {
+        message:
+          'Username must be lowercase and cannot contain number or special characters'
+      }),
     email: z.string().email(),
     password: z
       .string()
@@ -20,7 +23,7 @@ export const requestBody: ZodType = z
       .min(3)
       .max(50)
       .regex(/^(?:[A-Z][a-z]*)(?:\s[A-Z][a-z]*)*$/, {
-        message: 'First_name must be at least 3 characters and cannot exceed 50'
+        message: 'First_name must be starts with uppercase'
       })
       .optional(),
     last_name: z
@@ -28,7 +31,7 @@ export const requestBody: ZodType = z
       .min(3)
       .max(50)
       .regex(/^(?:[A-Z][a-z]*)(?:\s[A-Z][a-z]*)*$/, {
-        message: 'Last_name must be at least 3 characters and cannot exceed 50'
+        message: 'Last_name must be starts with uppercase'
       })
       .optional()
   })
