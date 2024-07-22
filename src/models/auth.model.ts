@@ -1,6 +1,6 @@
 import { User } from '@prisma/client';
 
-export interface RequestBody {
+export interface RequestRegister {
   username: string;
   email: string;
   password: string;
@@ -8,7 +8,12 @@ export interface RequestBody {
   last_name: string | null;
 }
 
-export interface ResponseData {
+export interface RequestLogin {
+  username: string;
+  password: string;
+}
+
+export interface ResponseRegister {
   id: string;
   username: string;
   email: string;
@@ -19,7 +24,12 @@ export interface ResponseData {
   updatedAt: Date;
 }
 
-export const toAuthResponse = (data: User): ResponseData => {
+export interface ResponseLogin {
+  id: string;
+  username: string;
+}
+
+export const toRegisterResponse = (data: User): ResponseRegister => {
   return {
     id: data.id,
     username: data.username,
@@ -29,5 +39,12 @@ export const toAuthResponse = (data: User): ResponseData => {
     total_balance: data.total_balance,
     createdAt: data.createdAt,
     updatedAt: data.updatedAt
+  };
+};
+
+export const toLoginResponse = (data: User): ResponseLogin => {
+  return {
+    id: data.id,
+    username: data.username
   };
 };
