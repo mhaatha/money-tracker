@@ -2,11 +2,9 @@ import winston from 'winston';
 import config from '../config/config';
 
 export const logger = winston.createLogger({
-  level: config.log_level || 'info',
+  level: config.logLevel || 'info',
   format: winston.format.combine(
-    config.log_level === 'debug'
-      ? winston.format.colorize()
-      : winston.format.uncolorize(),
+    config.logLevel === 'debug' ? winston.format.colorize() : winston.format.uncolorize(),
     winston.format.splat(),
     winston.format.printf(({ level, message }) => `${level}: ${message}`)
   ),
