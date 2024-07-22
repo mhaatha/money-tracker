@@ -44,8 +44,7 @@ export const errorHandler = (
     res.status(StatusCodes.BAD_REQUEST).json({
       errors
     });
-  }
-  if (err instanceof PrismaClientKnownRequestError) {
+  } else if (err instanceof PrismaClientKnownRequestError) {
     const errors = handlerPrismaError(err);
     const path = errors.error.target.split('_')[1];
 
@@ -56,6 +55,14 @@ export const errorHandler = (
           message: errors.message
         }
       ]
+    });
+  } else if (err instanceof ResponseError) {
+    res.status(err.status).json({
+      errors: err.message
+    });
+  } else {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      errors: 'Internal Server Error'
     });
   }
   next();
