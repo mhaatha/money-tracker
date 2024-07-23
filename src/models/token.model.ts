@@ -20,3 +20,7 @@ export interface TokenResponse {
     expired: Date;
   };
 }
+
+export interface RequestRefreshToken {
+  refreshToken: string;
+}
