@@ -1,7 +1,10 @@
 import * as jwt from 'jsonwebtoken';
 import moment from 'moment';
 import config from '../config/config';
+import { Token } from '@prisma/client';
 import { prisma } from '../../prisma';
+import { StatusCodes } from 'http-status-codes';
+import { ResponseError } from '../utils/response-error';
 import { TokenResponse } from '../models/token.model';
 import { TokenTypes, Payload } from '../models/token.model';
 
@@ -55,6 +58,31 @@ export const storeToken = async (userId: string): Promise<TokenResponse> => {
   });
 
   return jwt;
+};
+
+export const deleteToken = async (userId: string): Promise<void> => {
+  const token: Token | null = await prisma.token.findUnique({
+    where: {
+      user_id: userId
+    }
+  });
+
+  if (!token) {
+    throw new ResponseError(
+      StatusCodes.NOT_FOUND,
+      'Refresh token is not found in database',
+      {
+        path: 'user_id'
+      }
+    );
+  }
+
+  // DELETE REFRESH TOKEN
+  await prisma.token.delete({
+    where: {
+      id: token.id
+    }
+  });
 };
 
 export const verifyToken = async (token: string): Promise<Payload> => {
