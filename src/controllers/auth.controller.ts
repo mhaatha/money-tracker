@@ -5,6 +5,7 @@ import {
   ResponseLogin,
   ResponseRegister
 } from '../models/auth.model';
+import { storeToken } from '../services/token.service';
 import { StatusCodes } from 'http-status-codes';
 import { TokenResponse } from '../models/token.model';
 import { Request, Response, NextFunction } from 'express';
@@ -26,7 +27,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   try {
     const data: RequestLogin = req.body;
     const response: ResponseLogin = await service.login(data);
-    const jwt: TokenResponse = await service.storeToken(response.id);
+    const jwt: TokenResponse = await storeToken(response.id);
 
     res.status(StatusCodes.OK).json({
       data: response,
