@@ -4,7 +4,8 @@ import { auth } from '../middlewares/auth.middleware';
 
 const userRoute = express.Router();
 
-userRoute.route('/current-user')
+userRoute
+  .route('/current-user')
   .get(auth, controller.get)
   .patch(auth, controller.update)
   .delete(auth, controller.deleteUser);
