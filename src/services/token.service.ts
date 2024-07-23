@@ -1,6 +1,8 @@
 import * as jwt from 'jsonwebtoken';
 import moment from 'moment';
 import config from '../config/config';
+import { prisma } from '../../prisma';
+import { TokenResponse } from '../models/token.model';
 import { TokenTypes, Payload } from '../models/token.model';
 
 export const generateToken = async (
@@ -39,6 +41,20 @@ export const generateAuthToken = async (userId: string) => {
       expired: refreshTokenExpires.toDate()
     }
   };
+};
+
+export const storeToken = async (userId: string): Promise<TokenResponse> => {
+  const jwt = await generateAuthToken(userId);
+
+  // STORE REFRESH TOKEN TO DATABASE
+  await prisma.token.create({
+    data: {
+      user_id: userId,
+      refresh_token: jwt.refresh.token
+    }
+  });
+
+  return jwt;
 };
 
 export const verifyToken = async (token: string): Promise<Payload> => {
