@@ -25,7 +25,7 @@ model Token {
   id             String  @id @default(uuid())
   user           User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id        String  @unique
-  refresh_token  String
+  refresh_token  String  @db.VarChar(400)
 }
 
 model Category {
