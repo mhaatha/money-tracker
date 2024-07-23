@@ -6,9 +6,8 @@ import {
   ResponseRegister
 } from '../models/auth.model';
 import { StatusCodes } from 'http-status-codes';
-import { generateAuthToken } from '../services/token.service';
-import { Request, Response, NextFunction } from 'express';
 import { TokenResponse } from '../models/token.model';
+import { Request, Response, NextFunction } from 'express';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -27,11 +26,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   try {
     const data: RequestLogin = req.body;
     const response: ResponseLogin = await service.login(data);
-    const tokens: TokenResponse = await generateAuthToken(response.id);
+    const jwt: TokenResponse = await service.storeToken(response.id);
 
     res.status(StatusCodes.OK).json({
       data: response,
-      tokens
+      tokens: jwt
     });
   } catch (error) {
     next(error);
