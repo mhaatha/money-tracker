@@ -13,6 +13,8 @@ import { validate } from '../validations/validation';
 import bcrypt from 'bcrypt';
 import { ResponseError } from '../utils/response-error';
 import { StatusCodes } from 'http-status-codes';
+import { TokenResponse } from '../models/token.model';
+import { generateAuthToken } from './token.service';
 
 export const create = async (data: RequestRegister): Promise<ResponseRegister> => {
   const registerBody: RequestRegister = validate(registerBodyRequest, data);
@@ -65,4 +67,18 @@ export const login = async (data: RequestLogin): Promise<ResponseLogin> => {
   }
 
   return toLoginResponse(user);
+};
+
+export const storeToken = async (userId: string): Promise<TokenResponse> => {
+  const jwt = await generateAuthToken(userId);
+
+  // STORE REFRESH TOKEN TO DATABASE
+  await prisma.token.create({
+    data: {
+      user_id: userId,
+      refresh_token: jwt.refresh.token
+    }
+  });
+
+  return jwt;
 };
