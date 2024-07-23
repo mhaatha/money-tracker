@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { ZodError } from 'zod';
 import { ResponseError } from '../utils/response-error';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 
 const handlerPrismaError = (err: PrismaClientKnownRequestError) => {
   let meta = {};
@@ -55,6 +56,14 @@ export const errorHandler = (
           message: errors.message
         }
       ]
+    });
+  } else if (err instanceof JsonWebTokenError) {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      errors: 'JWT Access Token is invalid or expired'
+    });
+  } else if (err instanceof TokenExpiredError) {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      errors: 'JWT Access Token is invalid or expired'
     });
   } else if (err instanceof ResponseError) {
     res.status(err.status).json({
