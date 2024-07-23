@@ -1,10 +1,10 @@
 import * as service from '../services/auth.service';
-import { Payload } from '../models/token.model';
 import { StatusCodes } from 'http-status-codes';
 import { UserRequest } from '../types/user.type';
 import { TokenResponse } from '../models/token.model';
-import { storeToken, deleteToken } from '../services/token.service';
+import { Payload, RequestRefreshToken } from '../models/token.model';
 import { Request, Response, NextFunction } from 'express';
+import { storeToken, refreshJwt, deleteToken } from '../services/token.service';
 import {
   RequestLogin,
   RequestRegister,
@@ -59,7 +59,12 @@ export const refreshToken = async (
   next: NextFunction
 ) => {
   try {
-    res.send('Refresh Token');
+    const data: RequestRefreshToken = req.body;
+    const jwt: TokenResponse = await refreshJwt(data);
+
+    res.status(StatusCodes.OK).json({
+      data: jwt
+    });
   } catch (error) {
     next(error);
   }
