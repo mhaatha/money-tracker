@@ -1,14 +1,16 @@
 import * as service from '../services/auth.service';
+import { Payload } from '../models/token.model';
+import { StatusCodes } from 'http-status-codes';
+import { UserRequest } from '../types/user.type';
+import { TokenResponse } from '../models/token.model';
+import { storeToken, deleteToken } from '../services/token.service';
+import { Request, Response, NextFunction } from 'express';
 import {
   RequestLogin,
   RequestRegister,
   ResponseLogin,
   ResponseRegister
 } from '../models/auth.model';
-import { storeToken } from '../services/token.service';
-import { StatusCodes } from 'http-status-codes';
-import { TokenResponse } from '../models/token.model';
-import { Request, Response, NextFunction } from 'express';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -38,15 +40,24 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
-export const logout = async (req: Request, res: Response, next: NextFunction) => {
+export const logout = async (req: UserRequest, res: Response, next: NextFunction) => {
   try {
-    res.send('logout');
+    const userData = req.user as Payload;
+    await deleteToken(userData.sub!);
+
+    res.status(StatusCodes.OK).json({
+      data: null
+    });
   } catch (error) {
     next(error);
   }
 };
 
-export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+export const refreshToken = async (
+  req: UserRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     res.send('Refresh Token');
   } catch (error) {
