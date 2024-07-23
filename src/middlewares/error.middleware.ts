@@ -1,8 +1,8 @@
+import { ZodError } from 'zod';
+import { StatusCodes } from 'http-status-codes';
+import { ResponseError } from '../utils/response-error';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NextFunction, Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
-import { ZodError } from 'zod';
-import { ResponseError } from '../utils/response-error';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 
 const handlerPrismaError = (err: PrismaClientKnownRequestError) => {
