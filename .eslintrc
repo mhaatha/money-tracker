@@ -11,6 +11,7 @@
   ],
   "rules": {
     "no-console": "warn",
-    "semi": ["error", "always"]
+    "semi": ["error", "always"],
+    "no-undef": "off"
   }
 }
