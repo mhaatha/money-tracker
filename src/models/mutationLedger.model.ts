@@ -10,6 +10,13 @@ export interface RequestBody {
   amount: number;
 }
 
+export interface UpdateRequestBody {
+  type: TypeEnum | null;
+  user_id: string | null;
+  category_id: string | null;
+  amount: number | null;
+}
+
 export interface ResponseBody {
   id: string;
   type: string;
