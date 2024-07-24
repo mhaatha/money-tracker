@@ -6,9 +6,9 @@ import { validate } from '../validations/validation';
 import { Token, User } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import { ResponseError } from '../utils/response-error';
-import { RequestRefreshToken, TokenResponse } from '../models/token.model';
 import { tokenBodyRequest } from '../validations/token.validation';
 import { TokenTypes, Payload } from '../models/token.model';
+import { RequestRefreshToken, TokenResponse } from '../models/token.model';
 
 export const generateToken = async (
   userId: string,

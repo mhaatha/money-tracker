@@ -1,5 +1,10 @@
+import bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { prisma } from '../../prisma';
+import { validate } from '../validations/validation';
+import { StatusCodes } from 'http-status-codes';
+import { ResponseError } from '../utils/response-error';
+import { loginBodyRequest, registerBodyRequest } from '../validations/auth.validation';
 import {
   RequestLogin,
   RequestRegister,
@@ -8,11 +13,6 @@ import {
   toRegisterResponse,
   toLoginResponse
 } from '../models/auth.model';
-import { loginBodyRequest, registerBodyRequest } from '../validations/auth.validation';
-import { validate } from '../validations/validation';
-import bcrypt from 'bcrypt';
-import { ResponseError } from '../utils/response-error';
-import { StatusCodes } from 'http-status-codes';
 
 export const create = async (data: RequestRegister): Promise<ResponseRegister> => {
   const registerBody: RequestRegister = validate(registerBodyRequest, data);

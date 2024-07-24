@@ -1,7 +1,9 @@
 import { User } from '@prisma/client';
 import { prisma } from '../../prisma';
+import { validate } from '../validations/validation';
 import { StatusCodes } from 'http-status-codes';
 import { ResponseError } from '../utils/response-error';
+import { userBodyRequest } from '../validations/user.validation';
 import {
   GetUserResponse,
   toGetUserResponse,
@@ -11,8 +13,6 @@ import {
   UpdateBodyResponse,
   toUpdateUserResponse
 } from '../models/user.model';
-import { validate } from '../validations/validation';
-import { userBodyRequest } from '../validations/user.validation';
 
 export const getCurrentUser = async (userId: string): Promise<GetUserResponse> => {
   const user: User | null = await prisma.user.findUnique({
