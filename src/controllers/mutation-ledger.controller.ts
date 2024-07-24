@@ -1,9 +1,15 @@
-import { NextFunction, Response } from 'express';
+import { Payload } from '../models/token.model';
 import { UserRequest } from '../types/user.type';
-import { RequestBody } from '../models/mutationLedger.model';
-import { ResponseBody } from '../models/mutationLedger.model';
-import { createMutationLedger } from '../services/mutation-ledger.service';
 import { StatusCodes } from 'http-status-codes';
+import { ResponseBody } from '../models/mutationLedger.model';
+import { NextFunction, Response } from 'express';
+import { RequestBody, UpdateRequestBody } from '../models/mutationLedger.model';
+import {
+  createMutationLedger,
+  deleteMutation,
+  getMutations,
+  updateMutations
+} from '../services/mutation-ledger.service';
 
 export const create = async (req: UserRequest, res: Response, next: NextFunction) => {
   try {
@@ -20,7 +26,12 @@ export const create = async (req: UserRequest, res: Response, next: NextFunction
 
 export const get = async (req: UserRequest, res: Response, next: NextFunction) => {
   try {
-    res.send('adsad');
+    const dataUser: Payload = req.user as Payload;
+    const response: ResponseBody[] = await getMutations(dataUser.sub);
+
+    res.status(StatusCodes.OK).json({
+      data: response
+    });
   } catch (error) {
     next(error);
   }
@@ -28,7 +39,13 @@ export const get = async (req: UserRequest, res: Response, next: NextFunction) =
 
 export const update = async (req: UserRequest, res: Response, next: NextFunction) => {
   try {
-    res.send('adsad');
+    const data: UpdateRequestBody = req.body;
+    const mutationId: string = req.params.mutationId;
+    const response: ResponseBody = await updateMutations(data, mutationId);
+
+    res.status(StatusCodes.OK).json({
+      data: response
+    });
   } catch (error) {
     next(error);
   }
@@ -36,7 +53,12 @@ export const update = async (req: UserRequest, res: Response, next: NextFunction
 
 export const deleted = async (req: UserRequest, res: Response, next: NextFunction) => {
   try {
-    res.send('adsad');
+    const mutationId: string = req.params.mutationId;
+    await deleteMutation(mutationId);
+
+    res.status(StatusCodes.OK).json({
+      data: null
+    });
   } catch (error) {
     next(error);
   }
