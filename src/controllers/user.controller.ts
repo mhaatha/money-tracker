@@ -1,9 +1,19 @@
-import { StatusCodes } from 'http-status-codes';
 import { Payload } from '../models/token.model';
-import { GetUserBalanceResponse, GetUserResponse } from '../models/user.model';
-import { getCurrentUser, getCurrentUserBalance } from '../services/user.service';
+import { StatusCodes } from 'http-status-codes';
 import { UserRequest } from '../types/user.type';
 import { Response, NextFunction } from 'express';
+import {
+  GetUserBalanceResponse,
+  GetUserResponse,
+  UpdateBodyRequest,
+  UpdateBodyResponse
+} from '../models/user.model';
+import {
+  deleted,
+  getCurrentUser,
+  getCurrentUserBalance,
+  updateUser
+} from '../services/user.service';
 
 export const get = async (req: UserRequest, res: Response, next: NextFunction) => {
   try {
@@ -20,7 +30,13 @@ export const get = async (req: UserRequest, res: Response, next: NextFunction) =
 
 export const update = async (req: UserRequest, res: Response, next: NextFunction) => {
   try {
-    res.send('GET');
+    const dataUser: Payload = req.user as Payload;
+    const dataBody: UpdateBodyRequest = req.body;
+    const response: UpdateBodyResponse = await updateUser(dataBody, dataUser.sub);
+
+    res.status(StatusCodes.OK).json({
+      data: response
+    });
   } catch (error) {
     next(error);
   }
@@ -28,7 +44,11 @@ export const update = async (req: UserRequest, res: Response, next: NextFunction
 
 export const deleteUser = async (req: UserRequest, res: Response, next: NextFunction) => {
   try {
-    res.send('GET');
+    const data: Payload = req.user as Payload;
+    await deleted(data.sub);
+    res.status(StatusCodes.OK).json({
+      data: null
+    });
   } catch (error) {
     next(error);
   }
