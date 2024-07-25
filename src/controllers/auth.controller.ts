@@ -42,7 +42,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 export const logout = async (req: UserRequest, res: Response, next: NextFunction) => {
   try {
-    const userData = req.user as Payload;
+    const userData: Payload = req.user as Payload;
     await deleteToken(userData.sub!);
 
     res.status(StatusCodes.OK).json({
