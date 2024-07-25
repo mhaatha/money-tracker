@@ -5,16 +5,16 @@ import { StatusCodes } from 'http-status-codes';
 import { ResponseError } from '../utils/response-error';
 import { userBodyRequest } from '../validations/user.validation';
 import {
-  GetUserResponse,
-  toGetUserResponse,
-  GetUserBalanceResponse,
-  toGetUserBalanceResponse,
-  UpdateBodyRequest,
-  UpdateBodyResponse,
-  toUpdateUserResponse
+  ResponseGetUser,
+  toResponseGetUser,
+  ResponseGetUserBalance,
+  toResponseGetUserBalance,
+  RequestUpdate,
+  ResponseUpdate,
+  toResponseUpdate
 } from '../models/user.model';
 
-export const getCurrentUser = async (userId: string): Promise<GetUserResponse> => {
+export const getUserById = async (userId: string) => {
   const user: User | null = await prisma.user.findUnique({
     where: {
       id: userId
@@ -27,32 +27,28 @@ export const getCurrentUser = async (userId: string): Promise<GetUserResponse> =
     });
   }
 
-  return toGetUserResponse(user);
+  return user;
+};
+
+export const getCurrentUser = async (userId: string): Promise<ResponseGetUser> => {
+  const user: User | null = await getUserById(userId);
+
+  return toResponseGetUser(user);
 };
 
 export const getCurrentUserBalance = async (
   userId: string
-): Promise<GetUserBalanceResponse> => {
-  const user: User | null = await prisma.user.findUnique({
-    where: {
-      id: userId
-    }
-  });
+): Promise<ResponseGetUserBalance> => {
+  const user: User | null = await getUserById(userId);
 
-  if (!user) {
-    throw new ResponseError(StatusCodes.NOT_FOUND, 'User not found', {
-      path: 'user_id'
-    });
-  }
-
-  return toGetUserBalanceResponse(user);
+  return toResponseGetUserBalance(user);
 };
 
 export const updateUser = async (
-  data: UpdateBodyRequest,
+  data: RequestUpdate,
   userId: string
-): Promise<UpdateBodyResponse> => {
-  const updateBody: UpdateBodyRequest = validate(userBodyRequest, data);
+): Promise<ResponseUpdate> => {
+  const updateBody: RequestUpdate = validate(userBodyRequest, data);
 
   // VALIDATION: REQUEST BODY CANNOT EMPTY
   if (Object.keys(updateBody).length === 0) {
@@ -62,16 +58,7 @@ export const updateUser = async (
   }
 
   // VALIDATION: IS USER EXISTS
-  const user: User | null = await prisma.user.findUnique({
-    where: {
-      id: userId
-    }
-  });
-  if (!user) {
-    throw new ResponseError(StatusCodes.NOT_FOUND, 'User not found', {
-      path: 'user_id'
-    });
-  }
+  const user: User | null = await getUserById(userId);
 
   // UPDATE USER
   const updateUser: User = await prisma.user.update({
@@ -87,26 +74,17 @@ export const updateUser = async (
     }
   });
 
-  return toUpdateUserResponse(updateUser);
+  return toResponseUpdate(updateUser);
 };
 
 export const deleted = async (userId: string): Promise<void> => {
   // VALIDATION: IS USER EXISTS
-  const user: User | null = await prisma.user.findUnique({
-    where: {
-      id: userId
-    }
-  });
-  if (!user) {
-    throw new ResponseError(StatusCodes.NOT_FOUND, 'User not found', {
-      path: 'user_id'
-    });
-  }
+  const user: User | null = await getUserById(userId);
 
   // DELETE USER
   await prisma.user.delete({
     where: {
-      id: userId
+      id: user.id
     }
   });
 };
