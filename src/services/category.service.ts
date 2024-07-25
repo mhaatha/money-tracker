@@ -5,6 +5,22 @@ import { ResponseError } from '../utils/response-error';
 import { categoryBodyRequest } from '../validations/category.validation';
 import { RequestBody, ResponseBody } from '../models/category.model';
 
+export const getCategoryById = async (categoryId: string) => {
+  const category: ResponseBody | null = await prisma.category.findUnique({
+    where: {
+      id: categoryId
+    }
+  });
+
+  if (!category) {
+    throw new ResponseError(StatusCodes.NOT_FOUND, 'Category not found', {
+      path: 'category_id'
+    });
+  }
+
+  return category;
+};
+
 export const createCategory = async (data: RequestBody): Promise<ResponseBody> => {
   const createData: RequestBody = validate(categoryBodyRequest, data);
 
@@ -39,21 +55,12 @@ export const updateCategory = async (
   const updateData: RequestBody = validate(categoryBodyRequest, data);
 
   // VALIDATION: IS CATEGORY EXISTS
-  const category: ResponseBody | null = await prisma.category.findUnique({
-    where: {
-      id: categoryId
-    }
-  });
-  if (!category) {
-    throw new ResponseError(StatusCodes.NOT_FOUND, 'Category not found', {
-      path: 'category_id'
-    });
-  }
+  const category: ResponseBody | null = await getCategoryById(categoryId);
 
   // UPDATE CATEGORY
   const categoryUpdated: ResponseBody = await prisma.category.update({
     where: {
-      id: categoryId
+      id: category.id
     },
     data: {
       name: updateData.name
@@ -65,21 +72,12 @@ export const updateCategory = async (
 
 export const deleteCategory = async (categoryId: string): Promise<void> => {
   // VALIDATION: IS CATEGORY EXISTS
-  const category: ResponseBody | null = await prisma.category.findUnique({
-    where: {
-      id: categoryId
-    }
-  });
-  if (!category) {
-    throw new ResponseError(StatusCodes.NOT_FOUND, 'Category not found', {
-      path: 'category_id'
-    });
-  }
+  const category: ResponseBody | null = await getCategoryById(categoryId);
 
   // DELETE CATEGORY
   await prisma.category.delete({
     where: {
-      id: categoryId
+      id: category.id
     }
   });
 };
