@@ -9,6 +9,27 @@ import { ResponseError } from '../utils/response-error';
 import { tokenBodyRequest } from '../validations/token.validation';
 import { TokenTypes, Payload } from '../models/token.model';
 import { RequestRefreshToken, TokenResponse } from '../models/token.model';
+import { getUserById } from './user.service';
+
+export const getTokenByUserId = async (userId: string) => {
+  const token: Token | null = await prisma.token.findUnique({
+    where: {
+      user_id: userId
+    }
+  });
+
+  if (!token) {
+    throw new ResponseError(
+      StatusCodes.NOT_FOUND,
+      'Refresh token is not found in database',
+      {
+        path: 'user_id'
+      }
+    );
+  }
+
+  return token;
+};
 
 export const generateToken = async (
   userId: string,
@@ -16,7 +37,7 @@ export const generateToken = async (
   type: string,
   secret = config.jwt.secret!
 ) => {
-  const payload = {
+  const payload: Payload = {
     sub: userId,
     iat: moment().unix(),
     exp: expires.unix(),
@@ -71,29 +92,17 @@ export const refreshJwt = async (
 ): Promise<TokenResponse> => {
   const registerData: RequestRefreshToken = validate(tokenBodyRequest, refreshToken);
 
-  const payload: Payload = await verifyToken(registerData.refreshToken);
   // VALIDATION: TOKEN TYPE
+  const payload: Payload = await verifyToken(registerData.refreshToken);
   if (payload.type !== TokenTypes.REFRESH) {
     throw new ResponseError(StatusCodes.BAD_REQUEST, 'Invalid token type', {
       path: 'refreshToken'
     });
   }
 
-  const token: Token | null = await prisma.token.findUnique({
-    where: {
-      user_id: payload.sub
-    }
-  });
-  // VALIDATION: IS TOKEN EXIST
-  if (!token) {
-    throw new ResponseError(
-      StatusCodes.NOT_FOUND,
-      'Refresh token is not found in database',
-      {
-        path: 'user_id'
-      }
-    );
-  }
+  // VALIDATION: IS TOKEN EXISTS
+  const token: Token | null = await getTokenByUserId(payload.sub);
+
   // VALIDATION: IS TOKEN EXPIRED
   const tokenExpires = moment.unix(payload.exp).isBefore(moment());
   if (tokenExpires) {
@@ -102,17 +111,8 @@ export const refreshJwt = async (
     });
   }
 
-  const user: User | null = await prisma.user.findUnique({
-    where: {
-      id: payload.sub
-    }
-  });
   // VALIDATION: IS USER EXIST
-  if (!user) {
-    throw new ResponseError(StatusCodes.NOT_FOUND, 'User not found', {
-      path: 'user_id'
-    });
-  }
+  const user: User | null = await getUserById(payload.sub);
 
   // DELETE OLD REFRESH TOKEN
   await prisma.token.delete({
@@ -136,21 +136,8 @@ export const refreshJwt = async (
 };
 
 export const deleteToken = async (userId: string): Promise<void> => {
-  const token: Token | null = await prisma.token.findUnique({
-    where: {
-      user_id: userId
-    }
-  });
-
-  if (!token) {
-    throw new ResponseError(
-      StatusCodes.NOT_FOUND,
-      'Refresh token is not found in database',
-      {
-        path: 'user_id'
-      }
-    );
-  }
+  // VALIDATION: IS TOKEN EXISTS
+  const token: Token | null = await getTokenByUserId(userId);
 
   // DELETE REFRESH TOKEN
   await prisma.token.delete({
