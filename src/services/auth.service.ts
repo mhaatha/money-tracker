@@ -36,7 +36,7 @@ export const create = async (data: RequestRegister): Promise<ResponseRegister> =
 export const login = async (data: RequestLogin): Promise<ResponseLogin> => {
   const loginBody: RequestLogin = validate(loginBodyRequest, data);
 
-  // VALIDASI USERNAME
+  // VALIDATION: IS USERNAME EXISTS
   const user: User | null = await prisma.user.findUnique({
     where: {
       username: loginBody.username
@@ -52,7 +52,7 @@ export const login = async (data: RequestLogin): Promise<ResponseLogin> => {
     );
   }
 
-  // VALIDASI PASSWORD
+  // VALIDATION: IS PASSWORD CORRECT
   const isPasswordValid = await bcrypt.compare(loginBody.password, user.password);
   if (!isPasswordValid) {
     throw new ResponseError(
