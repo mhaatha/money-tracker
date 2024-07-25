@@ -2,7 +2,7 @@ import { prisma } from '../../prisma';
 import { validate } from '../validations/validation';
 import { StatusCodes } from 'http-status-codes';
 import { ResponseError } from '../utils/response-error';
-import { Category, Mutation_Ledger, User } from '@prisma/client';
+import { Mutation_Ledger, User } from '@prisma/client';
 import {
   mutationLedgerBodyRequest,
   updateMutation
@@ -12,34 +12,36 @@ import {
   ResponseBody,
   UpdateRequestBody
 } from '../models/mutationLedger.model';
+import { getUserById } from './user.service';
+import { getCategoryById } from './category.service';
+
+export const getMutationById = async (
+  mutationId: string
+): Promise<Mutation_Ledger | null> => {
+  const mutation: Mutation_Ledger | null = await prisma.mutation_Ledger.findUnique({
+    where: {
+      id: mutationId
+    }
+  });
+
+  if (!mutation) {
+    throw new ResponseError(StatusCodes.NOT_FOUND, 'Mutation not found', {
+      path: 'mutationId'
+    });
+  }
+
+  return mutation;
+};
 
 export const createMutationLedger = async (data: RequestBody): Promise<ResponseBody> => {
   const createData: RequestBody = validate(mutationLedgerBodyRequest, data);
 
   // VALIDATION: IS USER EXISTS
-  const user: User | null = await prisma.user.findUnique({
-    where: {
-      id: createData.user_id
-    }
-  });
-  if (!user) {
-    throw new ResponseError(StatusCodes.NOT_FOUND, 'User not found', {
-      path: 'user_id'
-    });
-  }
+  await getUserById(createData.user_id);
 
   // VALIDATION: IS CATEGORY EXISTS
   if (createData.category_id) {
-    const category: Category | null = await prisma.category.findUnique({
-      where: {
-        id: createData.category_id
-      }
-    });
-    if (!category) {
-      throw new ResponseError(StatusCodes.NOT_FOUND, 'Category not found', {
-        path: 'category_id'
-      });
-    }
+    await getCategoryById(createData.category_id);
   }
 
   // UPDATE USER TOTAL_BALANCE VALUE
@@ -79,24 +81,15 @@ export const createMutationLedger = async (data: RequestBody): Promise<ResponseB
 
 export const getMutations = async (userId: string): Promise<ResponseBody[]> => {
   // VALIDATION: IS USER EXISTS
-  const user: User | null = await prisma.user.findUnique({
-    where: {
-      id: userId
-    }
-  });
-  if (!user) {
-    throw new ResponseError(StatusCodes.NOT_FOUND, 'User not found', {
-      path: 'user_id'
-    });
-  }
+  const user: User | null = await getUserById(userId);
 
   // QUERY
   const mutations: ResponseBody[] = await prisma.mutation_Ledger.findMany({
     where: {
-      user_id: userId
+      user_id: user.id
     }
   });
-  if (!mutations) {
+  if (mutations.length === 0) {
     throw new ResponseError(StatusCodes.NOT_FOUND, 'Mutation not found', {
       path: 'user_id'
     });
@@ -112,43 +105,16 @@ export const updateMutations = async (
   const updateData: UpdateRequestBody = validate(updateMutation, data);
 
   // VALIDATION: IS MUTATION EXISTS
-  const mutation: Mutation_Ledger | null = await prisma.mutation_Ledger.findUnique({
-    where: {
-      id: mutationId
-    }
-  });
-  if (!mutation) {
-    throw new ResponseError(StatusCodes.NOT_FOUND, 'Mutation not found', {
-      path: 'mutationId'
-    });
-  }
+  const mutation: Mutation_Ledger | null = await getMutationById(mutationId);
 
   // VALIDATION: IS USER EXISTS
   if (updateData.user_id) {
-    const user: User | null = await prisma.user.findUnique({
-      where: {
-        id: updateData.user_id
-      }
-    });
-    if (!user) {
-      throw new ResponseError(StatusCodes.NOT_FOUND, 'User not found', {
-        path: 'user_id'
-      });
-    }
+    await getUserById(updateData.user_id);
   }
 
   // VALIDATION: IS CATEGORY EXISTS
   if (updateData.category_id) {
-    const category: Category | null = await prisma.category.findUnique({
-      where: {
-        id: updateData.category_id
-      }
-    });
-    if (!category) {
-      throw new ResponseError(StatusCodes.NOT_FOUND, 'Category not found', {
-        path: 'category_id'
-      });
-    }
+    await getCategoryById(updateData.category_id);
   }
 
   // UPDATE MUTATION
@@ -157,10 +123,10 @@ export const updateMutations = async (
       id: mutationId
     },
     data: {
-      type: updateData.type || mutation.type,
-      user_id: updateData.user_id || mutation.user_id,
-      category_id: updateData.category_id || mutation.category_id,
-      amount: updateData.amount || mutation.amount
+      type: updateData.type || mutation!.type,
+      user_id: updateData.user_id || mutation!.user_id,
+      category_id: updateData.category_id || mutation!.category_id,
+      amount: updateData.amount || mutation!.amount
     }
   });
 
@@ -168,22 +134,22 @@ export const updateMutations = async (
   if (updateData.type === 'Income') {
     await prisma.user.update({
       where: {
-        id: updateData.user_id || mutation.user_id
+        id: updateData.user_id || mutation!.user_id
       },
       data: {
         total_balance: {
-          increment: updateData.amount || mutation.amount
+          increment: updateData.amount || mutation!.amount
         }
       }
     });
   } else {
     await prisma.user.update({
       where: {
-        id: updateData.user_id || mutation.user_id
+        id: updateData.user_id || mutation!.user_id
       },
       data: {
         total_balance: {
-          decrement: updateData.amount || mutation.amount
+          decrement: updateData.amount || mutation!.amount
         }
       }
     });
@@ -194,21 +160,12 @@ export const updateMutations = async (
 
 export const deleteMutation = async (mutationId: string): Promise<void> => {
   // VALIDATION: IS MUTATION EXISTS
-  const mutation: Mutation_Ledger | null = await prisma.mutation_Ledger.findUnique({
-    where: {
-      id: mutationId
-    }
-  });
-  if (!mutation) {
-    throw new ResponseError(StatusCodes.NOT_FOUND, 'Mutation not found', {
-      path: 'mutationId'
-    });
-  }
+  const mutation: Mutation_Ledger | null = await getMutationById(mutationId);
 
   // DELETE MUTATION
   await prisma.mutation_Ledger.delete({
     where: {
-      id: mutationId
+      id: mutation!.id
     }
   });
 };
