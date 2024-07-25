@@ -1,6 +1,6 @@
 import { User } from '@prisma/client';
 
-export interface GetUserResponse {
+export interface ResponseGetUser {
   id: string;
   username: string;
   email: string;
@@ -10,11 +10,11 @@ export interface GetUserResponse {
   updatedAt: Date;
 }
 
-export interface GetUserBalanceResponse {
+export interface ResponseGetUserBalance {
   balance: number;
 }
 
-export const toGetUserResponse = (data: User): GetUserResponse => {
+export const toResponseGetUser = (data: User): ResponseGetUser => {
   return {
     id: data.id,
     username: data.username,
@@ -26,13 +26,13 @@ export const toGetUserResponse = (data: User): GetUserResponse => {
   };
 };
 
-export const toGetUserBalanceResponse = (data: User): GetUserBalanceResponse => {
+export const toResponseGetUserBalance = (data: User): ResponseGetUserBalance => {
   return {
     balance: data.total_balance
   };
 };
 
-export interface UpdateBodyRequest {
+export interface RequestUpdate {
   username: string | null;
   email: string | null;
   password: string | null;
@@ -40,7 +40,7 @@ export interface UpdateBodyRequest {
   last_name: string | null;
 }
 
-export interface UpdateBodyResponse {
+export interface ResponseUpdate {
   username: string;
   email: string | null;
   first_name: string | null;
@@ -49,7 +49,7 @@ export interface UpdateBodyResponse {
   updatedAt: Date;
 }
 
-export const toUpdateUserResponse = (data: User): UpdateBodyResponse => {
+export const toResponseUpdate = (data: User): ResponseUpdate => {
   return {
     username: data.username,
     email: data.email,
