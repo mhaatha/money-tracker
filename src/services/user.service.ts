@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { prisma } from '../../prisma';
 import { validate } from '../validations/validation';
@@ -60,6 +61,11 @@ export const updateUser = async (
   // VALIDATION: IS USER EXISTS
   const user: User | null = await getUserById(userId);
 
+  // BCRYPT PASSWORD
+  if (updateBody.password) {
+    updateBody.password = await bcrypt.hash(updateBody.password, 10);
+  }
+  
   // UPDATE USER
   const updateUser: User = await prisma.user.update({
     where: {
