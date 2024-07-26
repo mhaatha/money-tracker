@@ -65,7 +65,7 @@ export const updateUser = async (
   if (updateBody.password) {
     updateBody.password = await bcrypt.hash(updateBody.password, 10);
   }
-  
+
   // UPDATE USER
   const updateUser: User = await prisma.user.update({
     where: {
