@@ -34,18 +34,37 @@ export const createCategory = async (data: RequestBody): Promise<ResponseBody> =
   return category;
 };
 
-export const getCategories = async (userId: string): Promise<ResponseBody[]> => {
-  const categories: ResponseBody[] = await prisma.category.findMany({
-    where: {
-      mutationLedgers: {
-        some: {
-          user_id: userId
+export const getCategories = async (
+  userId: string,
+  name: string
+): Promise<ResponseBody[]> => {
+  if (name) {
+    const categories: ResponseBody[] = await prisma.category.findMany({
+      where: {
+        name: {
+          contains: name
         }
       }
-    }
-  });
+    });
 
-  return categories;
+    if (categories.length === 0) {
+      throw new ResponseError(StatusCodes.NOT_FOUND, 'Category not found', {
+        path: 'name'
+      });
+    }
+
+    return categories;
+  } else {
+    const categories: ResponseBody[] = await prisma.category.findMany({});
+
+    if (categories.length === 0) {
+      throw new ResponseError(StatusCodes.NOT_FOUND, 'Category not found', {
+        path: 'name'
+      });
+    }
+
+    return categories;
+  }
 };
 
 export const updateCategory = async (
