@@ -100,9 +100,6 @@ export const refreshJwt = async (
     });
   }
 
-  // VALIDATION: IS TOKEN EXISTS
-  const token: Token | null = await getTokenByUserId(payload.sub);
-
   // VALIDATION: IS TOKEN EXPIRED
   const tokenExpires = moment.unix(payload.exp).isBefore(moment());
   if (tokenExpires) {
@@ -113,6 +110,22 @@ export const refreshJwt = async (
 
   // VALIDATION: IS USER EXIST
   const user: User | null = await getUserById(payload.sub);
+
+  // VALIDATION: IS TOKEN EXISTS
+  const token: Token | null = await prisma.token.findFirst({
+    where: {
+      refresh_token: registerData.refreshToken
+    }
+  });
+  if (!token) {
+    throw new ResponseError(
+      StatusCodes.NOT_FOUND,
+      'Refresh token is not found in database',
+      {
+        path: 'refreshToken'
+      }
+    );
+  }
 
   // DELETE OLD REFRESH TOKEN
   await prisma.token.delete({
