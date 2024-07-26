@@ -26,7 +26,8 @@ export const create = async (req: UserRequest, res: Response, next: NextFunction
 export const get = async (req: UserRequest, res: Response, next: NextFunction) => {
   try {
     const user: Payload = req.user as Payload;
-    const response: ResponseBody[] = await getCategories(user.sub);
+    const data = req.query;
+    const response: ResponseBody[] = await getCategories(user.sub, data.name as string);
 
     res.status(StatusCodes.OK).json({
       data: response
