@@ -1,7 +1,12 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-dotenv.config({ path: path.join(__dirname, '../../.env') });
+const envPath =
+  process.env.NODE_ENV !== 'development'
+    ? path.join(__dirname, '../../../.env')
+    : path.join(__dirname, '../../.env');
+
+dotenv.config({ path: envPath });
 
 export default {
   env: process.env.NODE_ENV,
