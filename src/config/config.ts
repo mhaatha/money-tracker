@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 
 const envPath =
-  process.env.NODE_ENV !== 'development'
+  process.env.NODE_ENV === 'production'
     ? path.join(__dirname, '../../../.env')
     : path.join(__dirname, '../../.env');
 
