@@ -44,35 +44,34 @@ export const createMutationLedger = async (data: RequestBody): Promise<ResponseB
     await getCategoryById(createData.category_id);
   }
 
-  // UPDATE USER TOTAL_BALANCE VALUE
-  if (createData.type === 'Income') {
-    await prisma.user.update({
-      where: {
-        id: createData.user_id
-      },
-      data: {
-        total_balance: {
-          increment: createData.amount
-        }
-      }
-    });
-  } else {
-    await prisma.user.update({
-      where: {
-        id: createData.user_id
-      },
-      data: {
-        total_balance: {
-          decrement: createData.amount
-        }
-      }
-    });
-  }
-
   // CREATE MUTATION LEDGER
   const mutationLedger = await prisma.mutation_Ledger.create({
     data: {
       ...createData
+    }
+  });
+
+  // UPDATE USER TOTAL_BALANCE VALUE
+  const balances = await prisma.mutation_Ledger.findMany({
+    where: {
+      user_id: createData.user_id
+    }
+  });
+
+  const total_balance = balances.reduce((acc, cur) => {
+    if (cur.type === 'Income') {
+      return acc + cur.amount;
+    } else {
+      return acc - cur.amount;
+    }
+  }, 0);
+
+  await prisma.user.update({
+    where: {
+      id: createData.user_id
+    },
+    data: {
+      total_balance
     }
   });
 
@@ -131,29 +130,29 @@ export const updateMutations = async (
   });
 
   // UPDATE USER TOTAL_BALANCE VALUE
-  if (updateData.type === 'Income') {
-    await prisma.user.update({
-      where: {
-        id: updateData.user_id || mutation!.user_id
-      },
-      data: {
-        total_balance: {
-          increment: updateData.amount || mutation!.amount
-        }
-      }
-    });
-  } else {
-    await prisma.user.update({
-      where: {
-        id: updateData.user_id || mutation!.user_id
-      },
-      data: {
-        total_balance: {
-          decrement: updateData.amount || mutation!.amount
-        }
-      }
-    });
-  }
+  // UPDATE USER TOTAL_BALANCE VALUE
+  const balances = await prisma.mutation_Ledger.findMany({
+    where: {
+      user_id: updateData.user_id || mutation!.user_id
+    }
+  });
+
+  const total_balance = balances.reduce((acc, cur) => {
+    if (cur.type === 'Income') {
+      return acc + cur.amount;
+    } else {
+      return acc - cur.amount;
+    }
+  }, 0);
+
+  await prisma.user.update({
+    where: {
+      id: updateData.user_id || mutation!.user_id
+    },
+    data: {
+      total_balance
+    }
+  });
 
   return mutationLedger;
 };
