@@ -6,6 +6,7 @@ import {
   createCategory,
   deleteCategory,
   getCategories,
+  getCategoryById,
   updateCategory
 } from '../services/category.service';
 
@@ -26,6 +27,19 @@ export const get = async (req: UserRequest, res: Response, next: NextFunction) =
   try {
     const data = req.query;
     const response: ResponseBody[] = await getCategories(data.name as string);
+
+    res.status(StatusCodes.OK).json({
+      data: response
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getById = async (req: UserRequest, res: Response, next: NextFunction) => {
+  try {
+    const data = req.params;
+    const response: ResponseBody = await getCategoryById(data.categoryId);
 
     res.status(StatusCodes.OK).json({
       data: response
