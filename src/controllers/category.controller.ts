@@ -1,4 +1,3 @@
-import { Payload } from '../models/token.model';
 import { StatusCodes } from 'http-status-codes';
 import { UserRequest } from '../types/user.type';
 import { Response, NextFunction } from 'express';
@@ -25,9 +24,8 @@ export const create = async (req: UserRequest, res: Response, next: NextFunction
 
 export const get = async (req: UserRequest, res: Response, next: NextFunction) => {
   try {
-    const user: Payload = req.user as Payload;
     const data = req.query;
-    const response: ResponseBody[] = await getCategories(user.sub, data.name as string);
+    const response: ResponseBody[] = await getCategories(data.name as string);
 
     res.status(StatusCodes.OK).json({
       data: response
