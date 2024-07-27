@@ -8,6 +8,7 @@ categoryRoute.route('/').post(auth, controller.create).get(auth, controller.get)
 
 categoryRoute
   .route('/:categoryId')
+  .get(auth, controller.getById)
   .put(auth, controller.update)
   .delete(auth, controller.deleted);
 
