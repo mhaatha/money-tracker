@@ -34,10 +34,7 @@ export const createCategory = async (data: RequestBody): Promise<ResponseBody> =
   return category;
 };
 
-export const getCategories = async (
-  userId: string,
-  name: string
-): Promise<ResponseBody[]> => {
+export const getCategories = async (name: string): Promise<ResponseBody[]> => {
   if (name) {
     const categories: ResponseBody[] = await prisma.category.findMany({
       where: {
